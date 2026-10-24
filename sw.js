@@ -1,9 +1,9 @@
-const CACHE_NAME = 'forum-web-app-v1';
-const ASSETS = ['/', '/index.html', '/manifest.json'];
+const CACHE_NAME = 'forum-app-v1';
+const CACHE_URLS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CACHE_URLS))
   );
   self.skipWaiting();
 });
@@ -25,18 +25,22 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
 
-      return fetch(event.request).then((response) => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
+      return fetch(event.request)
+        .then((response) => {
+          if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+          }
+
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
           return response;
-        }
-
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-        return response;
-      }).catch(() => caches.match('/index.html'));
+        })
+        .catch(() => caches.match('/index.html'));
     })
   );
 });
