@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Forum Web App</title>
+    <link rel="manifest" href="/manifest.json" />
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --surface: rgba(255,255,255,0.82);
+        --surface-strong: #ffffff;
+        --primary: #4f46e5;
+        --primary-dark: #3730a3;
+        --text: #111827;
+        --muted: #667085;
+        --shadow: rgba(15, 23, 42, 0.12);
+        --border: rgba(148, 163, 184, 0.25);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        height: 100%;
+        font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: linear-gradient(180deg, #eef2ff 0%, var(--bg) 18%, #f8fafc 100%);
+        color: var(--text);
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        padding: 18px 14px 26px;
+      }
+
+      .app-shell {
+        width: min(100%, 620px);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 4px 0;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+        color: white;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.28);
+      }
+
+      .install-btn {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.75);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+      }
+
+      .hero {
+        background: linear-gradient(135deg, rgba(79,70,229,0.14), rgba(124,58,237,0.08));
+        border: 1px solid rgba(79,70,229,0.12);
+        border-radius: 26px;
+        padding: 18px 18px 16px;
+        box-shadow: 0 14px 30px var(--shadow);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--primary-dark);
+        font-weight: 800;
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+        line-height: 1.08;
+        letter-spacing: -0.06em;
+      }
+
+      .subtitle {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 0.96rem;
+        line-height: 1.6;
+      }
+
+      .form-shell {
+        background: rgba(255,255,255,0.8);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+        backdrop-filter: blur(12px);
+      }
+
+      .form-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        background: rgba(255,255,255,0.72);
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #eef2ff;
+        color: var(--primary-dark);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+        display: inline-block;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        height: calc(100vh - 285px);
+        min-height: 500px;
+        border: none;
+        background: white;
+      }
+
+      @media (min-width: 700px) {
+        .app-shell { width: min(100%, 760px); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="topbar">
+        <div class="brand">
+          <span class="brand-mark">F</span>
+          <span>Forum</span>
+        </div>
+        <button id="installBtn" class="install-btn" hidden>Install app</button>
+      </div>
+
+      <section class="hero">
+        <span class="eyebrow">Member access</span>
+        <h1>Join the conversation.</h1>
+        <p class="subtitle">
+          This app keeps the form content you pasted and wraps it in a cleaner, mobile-friendly web app shell.
+        </p>
+      </section>
+
+      <main class="form-shell" aria-label="Forum form app">
+        <div class="form-header">
+          <span class="chip"><span class="dot"></span> Live form</span>
+        </div>
+
+        <iframe src="https://form.fillout.com/t/vQYGmm4XNrus" title="Forum form"></iframe>
+      </main>
+    </div>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js');
+      }
+
+      let deferredPrompt;
+      const installBtn = document.getElementById('installBtn');
+
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+        installBtn.hidden = false;
+      });
+
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBtn.hidden = true;
+      });
+    </script>
+  </body>
+</html>
