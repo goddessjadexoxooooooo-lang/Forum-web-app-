@@ -3,8 +3,8 @@
   "short_name": "Forum App",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#7a4e2e",
+  "theme_color": "#6d4a2d",
   "icons": [
     {
       "src": "https://placeholder.com",
