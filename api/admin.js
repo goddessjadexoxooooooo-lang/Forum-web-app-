@@ -20,7 +20,8 @@ function requireAdmin(req) {
 async function readBody(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(chunk);
-  return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+  const raw = Buffer.concat(chunks).toString('utf8');
+  return raw ? JSON.parse(raw) : {};
 }
 
 async function getList() {
@@ -42,19 +43,19 @@ async function getOne(id) {
   return row || null;
 }
 
-async function updateStatus(id, updates) {
+async function updateApplication(id, patch) {
   const [row] = await sql`
     UPDATE applications
-    SET ${sql(updateStatusToColumnName(updates))}, updated_at = NOW()
+    SET
+      status = ${patch.status ?? 'submitted'},
+      payment_status = ${patch.payment_status ?? 'pending'},
+      approval_status = ${patch.approval_status ?? 'pending'},
+      access_status = ${patch.access_status ?? 'not_authorized'},
+      updated_at = NOW()
     WHERE id = ${id}
     RETURNING id, name, email, data, signature, status, payment_status, approval_status, access_status, created_at, updated_at
   `;
   return row || null;
-}
-
-function updateStatusToColumnName(updates) {
-  const fields = Object.entries(updates).map(([key, value]) => `${key} = ${value}`);
-  return fields.join(', ');
 }
 
 export default async function handler(req, res) {
@@ -106,7 +107,7 @@ export default async function handler(req, res) {
   }
 
   if (action === 'approve') {
-    const updated = await updateStatus(id, {
+    const updated = await updateApplication(id, {
       approval_status: 'approved',
       status: 'approved',
     });
@@ -114,7 +115,7 @@ export default async function handler(req, res) {
   }
 
   if (action === 'payment-verified' || action === 'payment_verified') {
-    const updated = await updateStatus(id, {
+    const updated = await updateApplication(id, {
       payment_status: 'verified',
       status: 'payment_verified',
     });
@@ -122,7 +123,7 @@ export default async function handler(req, res) {
   }
 
   if (action === 'reject') {
-    const updated = await updateStatus(id, {
+    const updated = await updateApplication(id, {
       approval_status: 'rejected',
       status: 'rejected',
     });
@@ -136,7 +137,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const updated = await updateStatus(id, {
+    const updated = await updateApplication(id, {
       access_status: 'authorized',
       status: 'access_authorized',
     });
