@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { sendApplicationSubmittedEmail, sendStatusEmail } from './email.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -43,19 +44,67 @@ async function getOne(id) {
   return row || null;
 }
 
-async function updateApplication(id, patch) {
+async function updateStatus(id, updates) {
+  const payload = {
+    status: updates.status ?? 'submitted',
+    payment_status: updates.payment_status ?? 'pending',
+    approval_status: updates.approval_status ?? 'pending',
+    access_status: updates.access_status ?? 'not_authorized',
+  };
+
   const [row] = await sql`
     UPDATE applications
-    SET
-      status = ${patch.status ?? 'submitted'},
-      payment_status = ${patch.payment_status ?? 'pending'},
-      approval_status = ${patch.approval_status ?? 'pending'},
-      access_status = ${patch.access_status ?? 'not_authorized'},
-      updated_at = NOW()
+    SET status = ${payload.status},
+        payment_status = ${payload.payment_status},
+        approval_status = ${payload.approval_status},
+        access_status = ${payload.access_status},
+        updated_at = NOW()
     WHERE id = ${id}
     RETURNING id, name, email, data, signature, status, payment_status, approval_status, access_status, created_at, updated_at
   `;
+
   return row || null;
+}
+
+async function notifyStatusChange(app, action) {
+  if (!app?.email) return;
+
+  const statusMessages = {
+    approve: {
+      status: 'approved',
+      message: 'Your application has been approved. Payment verification and review are complete.',
+    },
+    'payment-verified': {
+      status: 'payment_verified',
+      message: 'Your payment has been verified. We are finalizing your application review.',
+    },
+    reject: {
+      status: 'rejected',
+      message: 'Your application was not approved at this time. Please contact support for more information.',
+    },
+    authorize: {
+      status: 'access_authorized',
+      message: 'Your access has been authorized. Your application is now fully approved and active.',
+    },
+    submitted: {
+      status: 'submitted',
+      message: 'Your application has been received and is now under review.',
+    },
+  };
+
+  const config = statusMessages[action];
+  if (!config) return;
+
+  try {
+    await sendStatusEmail({
+      email: app.email,
+      name: app.name || 'Applicant',
+      status: config.status,
+      message: config.message,
+    });
+  } catch (error) {
+    console.error(`Failed to send ${action} email:`, error);
+  }
 }
 
 export default async function handler(req, res) {
@@ -106,27 +155,38 @@ export default async function handler(req, res) {
     return res.status(404).json({ error: 'Application not found.' });
   }
 
+  let updated;
+
   if (action === 'approve') {
-    const updated = await updateApplication(id, {
+    updated = await updateStatus(id, {
       approval_status: 'approved',
       status: 'approved',
+      payment_status: current.payment_status || 'pending',
+      access_status: 'not_authorized',
     });
+    await notifyStatusChange(updated || current, 'approve');
     return res.json({ ok: true, application: updated });
   }
 
   if (action === 'payment-verified' || action === 'payment_verified') {
-    const updated = await updateApplication(id, {
+    updated = await updateStatus(id, {
       payment_status: 'verified',
       status: 'payment_verified',
+      approval_status: current.approval_status || 'pending',
+      access_status: 'not_authorized',
     });
+    await notifyStatusChange(updated || current, 'payment-verified');
     return res.json({ ok: true, application: updated });
   }
 
   if (action === 'reject') {
-    const updated = await updateApplication(id, {
+    updated = await updateStatus(id, {
       approval_status: 'rejected',
       status: 'rejected',
+      payment_status: current.payment_status || 'pending',
+      access_status: 'not_authorized',
     });
+    await notifyStatusChange(updated || current, 'reject');
     return res.json({ ok: true, application: updated });
   }
 
@@ -137,10 +197,13 @@ export default async function handler(req, res) {
       });
     }
 
-    const updated = await updateApplication(id, {
+    updated = await updateStatus(id, {
       access_status: 'authorized',
       status: 'access_authorized',
+      payment_status: 'verified',
+      approval_status: 'approved',
     });
+    await notifyStatusChange(updated || current, 'authorize');
     return res.json({ ok: true, application: updated });
   }
 
