@@ -63,8 +63,9 @@ async function serveStatic(urlPath, res) {
 
 http
   .createServer(async (req, res) => {
-    if (req.url.startsWith('/api/submit')) {
-      const { default: handler } = await import('./api/submit.js');
+    const apiRoute = req.url.split('?')[0].match(/^\/api\/(submit|captcha)$/);
+    if (apiRoute) {
+      const { default: handler } = await import(`./api/${apiRoute[1]}.js`);
       req.body = await readBody(req);
       return handler(req, withVercelHelpers(res));
     }

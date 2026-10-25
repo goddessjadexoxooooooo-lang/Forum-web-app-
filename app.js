@@ -151,10 +151,57 @@
       else payload[key] = value;
     }
     payload.signature = canvas.toDataURL('image/png');
+    payload.captchaToken = captchaToken();
     return payload;
   }
 
+  const captchaField = document.getElementById('captchaField');
+  const captchaError = document.getElementById('captchaError');
+  let captchaWidgetId = null;
+  let captchaSiteKey = null;
+
+  async function loadCaptcha() {
+    try {
+      const res = await fetch('/api/captcha');
+      if (!res.ok) throw new Error('Captcha unavailable');
+      captchaSiteKey = (await res.json()).siteKey;
+      renderCaptcha();
+    } catch {
+      captchaError.textContent = 'The captcha could not load. Please refresh the page.';
+      setError(captchaField, true);
+    }
+  }
+
+  function renderCaptcha() {
+    if (captchaWidgetId !== null || !captchaSiteKey) return;
+    if (!window.turnstile) {
+      setTimeout(renderCaptcha, 200);
+      return;
+    }
+    captchaWidgetId = window.turnstile.render('#captchaWidget', {
+      sitekey: captchaSiteKey,
+      theme: 'light',
+      callback: () => setError(captchaField, false),
+    });
+  }
+
+  function captchaToken() {
+    return captchaWidgetId !== null && window.turnstile ? window.turnstile.getResponse(captchaWidgetId) || '' : '';
+  }
+
+  function resetCaptcha() {
+    if (captchaWidgetId !== null && window.turnstile) window.turnstile.reset(captchaWidgetId);
+  }
+
+  loadCaptcha();
+
   async function submit() {
+    if (!captchaToken()) {
+      captchaError.textContent = 'Please complete the captcha.';
+      setError(captchaField, true);
+      captchaField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     nextBtn.disabled = true;
     status.textContent = 'Submitting...';
     status.classList.remove('is-error');
@@ -164,11 +211,14 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(collect()),
       });
-      if (!res.ok) throw new Error('Request failed');
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Request failed');
       current = thanksPage;
       render();
-    } catch {
-      status.textContent = 'Something went wrong submitting your application. Please try again.';
+    } catch (error) {
+      resetCaptcha();
+      status.textContent = error.message.startsWith('Captcha')
+        ? error.message
+        : 'Something went wrong submitting your application. Please try again.';
       status.classList.add('is-error');
     } finally {
       nextBtn.disabled = false;

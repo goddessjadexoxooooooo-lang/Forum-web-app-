@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { verifyCaptcha } from './captcha.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -23,7 +24,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  const { signature, ...fields } = body;
+  const { signature, captchaToken, ...fields } = body;
+
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const remoteIp = typeof forwardedFor === 'string' ? forwardedFor.split(',')[0].trim() : undefined;
+  if (!(await verifyCaptcha(captchaToken, remoteIp))) {
+    return res.status(400).json({ error: 'Captcha check failed. Please try again.' });
+  }
+
   const data = {};
   for (const [key, value] of Object.entries(fields)) {
     if (/^[a-zA-Z0-9_]{1,64}$/.test(key)) data[key] = clean(value);
