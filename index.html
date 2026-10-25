@@ -2,264 +2,325 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#6d4a2d" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#7d5f3e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>Forum Web App</title>
+    <meta name="description" content="Official No Nut November 2026 Application & Commitment Agreement, hosted by Goddess Jade." />
+    <title>No Nut November 2026 Application | Goddess Jade</title>
     <link rel="manifest" href="/manifest.json" />
-    <style>
-      :root {
-        --bg: #7a4e2e;
-        --bg-deep: #5d3b21;
-        --panel: #f3eadb;
-        --panel-strong: #f7f0e6;
-        --primary: #c8995f;
-        --primary-soft: #dbc29d;
-        --text: #2f1f14;
-        --muted: #6e5547;
-        --dark: #2b1b13;
-        --line: rgba(76, 48, 29, 0.32);
-        --shadow: rgba(39, 23, 10, 0.22);
-        --logo-pink: #e6b3b8;
-      }
-
-      * { box-sizing: border-box; }
-
-      html, body {
-        margin: 0;
-        height: 100%;
-        font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-        color: var(--text);
-      }
-
-      body {
-        display: flex;
-        justify-content: center;
-        padding: 18px 14px 30px;
-      }
-
-      .app-shell {
-        width: min(100%, 620px);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      }
-
-      .browser-bar {
-        background: linear-gradient(180deg, #b58a61, #93714b);
-        border: 1px solid rgba(55, 35, 18, 0.55);
-        border-radius: 16px 16px 0 0;
-        box-shadow: 0 14px 24px rgba(28, 19, 11, 0.2);
-        padding: 10px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-      }
-
-      .browser-icons,
-      .browser-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .nav-button,
-      .action-button {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.18);
-        border: 1px solid rgba(64,40,22,0.28);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(255,255,255,0.9);
-        font-size: 0.7rem;
-      }
-
-      .browser-address {
-        flex: 1;
-        background: rgba(255,255,255,0.18);
-        border: 1px solid rgba(75, 47, 26, 0.35);
-        border-radius: 999px;
-        min-height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(255,255,255,0.9);
-        font-size: 0.8rem;
-        letter-spacing: 0.02em;
-      }
-
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 4px 6px 0;
-      }
-
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 150px;
-      }
-
-      .brand-logo {
-        width: 100%;
-        height: auto;
-        display: block;
-        filter: drop-shadow(0 3px 8px rgba(44, 24, 12, 0.12));
-      }
-
-      .install-btn {
-        border: 1px solid rgba(255,255,255,0.38);
-        background: rgba(255,255,255,0.09);
-        color: white;
-        border-radius: 999px;
-        padding: 9px 14px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        cursor: pointer;
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-      }
-
-      .hero {
-        border: 1px solid rgba(91, 62, 38, 0.12);
-        background: rgba(255,255,255,0.06);
-        border-radius: 18px;
-        padding: 16px 18px;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-      }
-
-      .eyebrow {
-        display: inline-block;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: rgba(255,255,255,0.8);
-        font-weight: 700;
-        margin-bottom: 8px;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: clamp(1.8rem, 5vw, 2.5rem);
-        line-height: 1.05;
-        letter-spacing: -0.06em;
-        color: #fff0dc;
-      }
-
-      .subtitle {
-        margin: 10px 0 0;
-        color: rgba(255,255,255,0.86);
-        font-size: 0.95rem;
-        line-height: 1.6;
-      }
-
-      .form-shell {
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.16);
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 16px 30px rgba(31, 18, 9, 0.18);
-      }
-
-      .form-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 14px 16px;
-        border-bottom: 1px solid rgba(86, 53, 30, 0.22);
-        background: rgba(255,255,255,0.08);
-      }
-
-      .chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(255,255,255,0.12);
-        color: #fff3dd;
-        border-radius: 999px;
-        padding: 8px 12px;
-        font-size: 0.8rem;
-        font-weight: 700;
-      }
-
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #7fe3a8;
-        display: inline-block;
-      }
-
-      iframe {
-        display: block;
-        width: 100%;
-        height: calc(100vh - 330px);
-        min-height: 520px;
-        border: none;
-        background: #f3eadb;
-      }
-
-      @media (min-width: 700px) {
-        .app-shell { width: min(100%, 760px); }
-      }
-    </style>
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <div class="topbar">
-        <div class="brand" aria-label="Goddess Jade brand">
-          <img class="brand-logo" src="/assets/goddess-jade-logo.svg" alt="Goddess Jade" />
+    <header class="topbar">
+      <button type="button" class="back-btn" id="backBtn" aria-label="Go back" hidden>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+
+      <ol class="stepper" aria-label="Application progress">
+        <li class="step" data-step="0"><span class="step-dot"></span><span class="step-label">Start</span></li>
+        <li class="step" data-step="1"><span class="step-dot"></span><span class="step-label">Details</span></li>
+        <li class="step" data-step="2"><span class="step-dot"></span><span class="step-label">Last step</span></li>
+      </ol>
+
+      <img class="brand-logo" src="/assets/goddess-jade-logo.svg" alt="Goddess Jade" />
+    </header>
+
+    <main>
+      <form class="card" id="applicationForm" novalidate>
+        <div class="honeypot" aria-hidden="true">
+          <label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
         </div>
-        <button id="installBtn" class="install-btn" hidden>Install app</button>
-      </div>
 
-      <section class="hero">
-        <span class="eyebrow">Member access</span>
-        <h1>Join the conversation.</h1>
-        <p class="subtitle">
-          Become a member of the Goddess Jade community. Fill out the form below to get started.
-        </p>
-      </section>
+        <!-- Welcome -->
+        <section class="page" data-page="0" data-stage="0">
+          <h1 class="title-xl">NO NUT NOVEMBER 2026</h1>
+          <p class="title-sub">Official Application &amp; Commitment Agreement</p>
+          <p class="hosted">Hosted by Goddess Jade</p>
 
-      <main class="form-shell" aria-label="Forum form app">
-        <div class="form-header">
-          <span class="chip"><span class="dot"></span> Live form</span>
+          <h2 class="welcome-heading">Welcome</h2>
+          <div class="prose">
+            <p>Welcome to the official No Nut November 2026 application. This challenge is for individuals interested in a structured month of chastity, discipline, accountability, and personal commitment under my direction.</p>
+            <p>Your November experience will take place through Lockyn, my dedicated app designed to bring challenge participation, check-ins, communication, and accountability together in one place. Throughout the challenge, Lockyn will be your central space for staying connected, keeping track of your commitments, and following the expectations established for November.</p>
+            <p>Before applying, take the time to review the expectations and consider whether this experience is right for you. I expect applicants to be honest about their intentions, understand what participation involves, and be prepared to follow through on their commitments.</p>
+            <p>Please answer all required questions accurately and thoughtfully. Your responses will help me assess your eligibility and determine whether this challenge is a suitable fit for you. Incomplete applications, unrealistic expectations, or an inability to meet the challenge requirements may affect your eligibility for acceptance.</p>
+          </div>
+          <p class="ready">Think you&rsquo;re ready? Let&rsquo;s find out.</p>
+        </section>
+
+        <!-- Section 1 -->
+        <section class="page" data-page="1" data-stage="0" hidden>
+          <h2 class="section-title">Section 1: Applicant Information</h2>
+          <div class="prose">
+            <p>Please enter your contact details below and make sure everything is accurate. Your preferred contact method should be active so you can be reached if needed.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="name">Name / Nickname:<span class="req">*</span></label>
+            <div class="control"><input type="text" id="name" name="name" required autocomplete="nickname" /></div>
+            <p class="error-msg">Please fill in this field.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="contact">What is your Telegram username? If you do not use Telegram, please provide your Snapchat, Microsoft Teams, or another reliable contact method.<span class="req">*</span></label>
+            <div class="control"><input type="text" id="contact" name="contact" required /></div>
+            <p class="error-msg">Please fill in this field.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="email">What is your email address?</label>
+            <div class="control"><input type="email" id="email" name="email" autocomplete="email" /></div>
+            <p class="error-msg">Please enter a valid email address.</p>
+          </div>
+
+          <fieldset class="field" data-required-group="is18">
+            <legend class="field-label">Are you at least 18 years old?<span class="req">*</span></legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="is18" value="Yes" /> Yes</label>
+              <label class="choice"><input type="radio" name="is18" value="No" /> No</label>
+            </div>
+            <p class="error-msg" data-default="Please select an option.">Please select an option.</p>
+          </fieldset>
+        </section>
+
+        <!-- Section 2 -->
+        <section class="page" data-page="2" data-stage="0" hidden>
+          <h2 class="section-title">Section 2: Interest &amp; Commitment</h2>
+          <div class="prose">
+            <p>This section is intended to help me understand your reasons for applying, what you hope to gain from No Nut November 2026, and whether you are genuinely prepared for the commitment involved. Please answer honestly and give each question thoughtful consideration. Applications should reflect genuine interest and a clear understanding of what participation entails.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="interested">Are you genuinely interested in participating in No Nut November 2026 under Goddess Jade&apos;s direction?</label>
+            <div class="control">
+              <select id="interested" name="interested">
+                <option value=""></option>
+                <option>Yes</option>
+                <option>No</option>
+                <option>Not sure yet</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="why">Why do you want to participate in No Nut November?</label>
+            <div class="control"><textarea id="why" name="why"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="hoping">What are you hoping to get out of this experience?</label>
+            <div class="control"><textarea id="hoping" name="hoping"></textarea></div>
+          </div>
+        </section>
+
+        <!-- Section 3 -->
+        <section class="page" data-page="3" data-stage="0" hidden>
+          <h2 class="section-title">Section 3: Tribute &amp; Financial Commitment</h2>
+          <div class="prose">
+            <p>Tribute is a required part of participating in No Nut November 2026 under Goddess Jade&rsquo;s direction. The minimum tribute amount is <strong>$20, with no set maximum</strong>. You may choose any amount above the minimum based on your personal budget and financial circumstances. Your payment frequency and arrangement will be discussed and agreed upon before your participation is confirmed.</p>
+            <p>Please consider your finances carefully before applying. Be honest about what you can afford and choose an amount you can genuinely commit to. You are expected to follow through on the payment arrangement agreed upon if your application is accepted. Do not commit to an amount that would put you in financial difficulty.</p>
+            <p>Your required tribute must be received by <strong>November 1, 2026, at 8:00 AM Pacific Time</strong>. Your application will only be confirmed once it has been approved and your payment has been received and verified. Submitting an application does not guarantee acceptance.</p>
+            <p>Please answer the following questions honestly, including your planned tribute amount, preferred payment frequency, and preferred payment method. Ensure your answers reflect your actual budget and the payment commitment you are comfortable making.</p>
+            <p class="emphasis">Any payment arrangement must be agreed upon before your participation is confirmed.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="budget">What is your realistic budget for this experience?</label>
+            <span class="field-label">Short answer. Enter your amount and currency.<span class="req">*</span></span>
+            <span class="hint">Minimum: $20. No maximum.</span>
+            <div class="control"><input type="text" id="budget" name="budget" required /></div>
+            <p class="error-msg">Please fill in this field.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="arrangement">What tribute arrangement can you consistently maintain?<span class="req">*</span></label>
+            <div class="control">
+              <select id="arrangement" name="arrangement" required>
+                <option value=""></option>
+                <option>One-time payment</option>
+                <option>Weekly</option>
+                <option>Bi-weekly</option>
+                <option>Monthly</option>
+                <option>Other (to be discussed)</option>
+              </select>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="commitAmount">What amount can you comfortably commit to your selected payment arrangement?</label>
+            <span class="hint">Short answer</span>
+            <div class="control"><input type="text" id="commitAmount" name="commitAmount" /></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="paymentMethod">Which payment method would you use?<span class="req">*</span></label>
+            <div class="control">
+              <select id="paymentMethod" name="paymentMethod" required>
+                <option value=""></option>
+                <option>Cash App</option>
+                <option>PayPal</option>
+                <option>Venmo</option>
+                <option>Apple Pay</option>
+                <option>Gift card</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="deadlineReady">Are you financially prepared to meet the required tribute deadline of November 1, 2026 at 8:00 AM Pacific Time?</label>
+            <div class="control">
+              <select id="deadlineReady" name="deadlineReady">
+                <option value=""></option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="understandConfirmation">Do you understand that your participation will only be confirmed once your application is approved, your payment is received and verified, and your payment arrangement is agreed upon?<span class="req">*</span></label>
+            <div class="control">
+              <select id="understandConfirmation" name="understandConfirmation" required>
+                <option value=""></option>
+                <option>Yes, I understand</option>
+                <option>No, I need clarification</option>
+              </select>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </div>
+        </section>
+
+        <!-- Section 4 -->
+        <section class="page" data-page="4" data-stage="1" hidden>
+          <h2 class="section-title">Section 4: Limits, Boundaries &amp; Safety</h2>
+          <div class="prose">
+            <p>Before participating in No Nut November 2026, it&rsquo;s important that I understand your limits, boundaries, and any safety considerations relevant to your participation. Please answer the following questions honestly and provide enough detail to make your limits clear. This information helps establish expectations and ensures that boundaries are discussed before participation begins.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="hardLimits">What are your hard limits?</label>
+            <span class="hint">List activities or expectations that require discussion, additional boundaries, or special consideration.</span>
+            <div class="control"><textarea id="hardLimits" name="hardLimits"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="softLimits">What are your soft limits?</label>
+            <span class="hint">List activities or expectations that require discussion, additional boundaries, or special consideration.</span>
+            <div class="control"><textarea id="softLimits" name="softLimits"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="safeword">What is your safeword?</label>
+            <span class="hint">If you do not have one, write &ldquo;Need to establish one.&rdquo; We will establish a clear safety protocol before any applicable activities begin.</span>
+            <div class="control"><textarea id="safeword" name="safeword"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="healthConcerns">Do you have any relevant health, physical, emotional, or practical concerns that could affect safe participation?</label>
+            <span class="hint">Long answer, optional</span>
+            <div class="control"><textarea id="healthConcerns" name="healthConcerns"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="clarify">Are there any specific boundaries, expectations, or topics you would like clarified before participating?</label>
+            <span class="hint">Long answer, optional</span>
+            <div class="control"><textarea id="clarify" name="clarify"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="feelSafe">Is there anything else you would like me to know about your limits or what helps you feel safe during this experience?</label>
+            <span class="hint">Long answer, optional</span>
+            <div class="control"><textarea id="feelSafe" name="feelSafe"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="otherSafety">Is there anything else relevant to your safety or participation that I should know?</label>
+            <span class="hint">Optional short answer.</span>
+            <div class="control"><textarea id="otherSafety" name="otherSafety"></textarea></div>
+          </div>
+        </section>
+
+        <!-- Section 5 -->
+        <section class="page" data-page="5" data-stage="1" hidden>
+          <h2 class="section-title">Section 5: Honesty, Accountability &amp; Participation</h2>
+          <div class="prose">
+            <p>Participation in No Nut November 2026 requires honesty, consistent communication, and accountability. Applicants are expected to be truthful about their circumstances, honor agreed payment arrangements, and communicate promptly if something affects their ability to meet a commitment. <strong>Providing false information or intentionally lying during the application process or throughout the program may result in disqualification or removal from participation.</strong> Please answer the following questions thoughtfully and honestly so I can assess your readiness to participate.</p>
+          </div>
+
+          <fieldset class="field" data-required-group="truthful">
+            <legend class="field-label bold">Do you agree to provide truthful and accurate information throughout the application process and your participation in the program?<span class="req">*</span></legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="truthful" value="Yes" /> Yes</label>
+              <label class="choice"><input type="radio" name="truthful" value="No" /> No</label>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </fieldset>
+
+          <fieldset class="field" data-required-group="honorPayment">
+            <legend class="field-label bold">Are you prepared to honor your agreed payment arrangement and communicate promptly if a financial issue affects your ability to meet it?<span class="req">*</span></legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="honorPayment" value="Yes" /> Yes</label>
+              <label class="choice"><input type="radio" name="honorPayment" value="No" /> No</label>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </fieldset>
+        </section>
+
+        <!-- Section 6 -->
+        <section class="page" data-page="6" data-stage="2" hidden>
+          <h2 class="section-title">Section 6: Required Terms &amp; Conditions of Participation</h2>
+          <div class="prose">
+            <p>Please read each statement carefully before selecting the corresponding checkbox. By checking a box, you acknowledge that you have read, understood, and agree to the terms outlined in that statement.</p>
+            <p>These terms establish the expectations and conditions for participating in No Nut November 2026 under Goddess Jade&rsquo;s direction, including payment obligations, communication, conduct, personal boundaries, consent, and safety. All required acknowledgments must be completed before submitting your application.</p>
+            <p>By submitting this application, you confirm that the information you have provided is accurate to the best of your knowledge and that you understand the commitments associated with participation. If you do not understand or agree with any of the stated terms, please request clarification before proceeding. Submission of an application does not guarantee acceptance or confirm participation.</p>
+          </div>
+
+          <fieldset class="field" data-required-checks="terms">
+            <legend class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Terms and conditions</legend>
+            <div class="terms">
+              <label class="term"><input type="checkbox" name="terms" value="Age & Accuracy" /><span><strong>Age &amp; Accuracy:</strong> I confirm that I am at least 18 years of age and that the information provided in this application is accurate and complete to the best of my knowledge.</span></label>
+              <label class="term"><input type="checkbox" name="terms" value="Voluntary Participation" /><span><strong>Voluntary Participation:</strong> I understand that participation in No Nut November 2026 is voluntary and that submitting an application does not guarantee acceptance or confirm registration.</span></label>
+              <label class="term"><input type="checkbox" name="terms" value="Payment Deadline" /><span><strong>Payment Deadline:</strong> I understand that my required tribute must be received by <strong>November 1, 2026 at 8:00 AM Pacific Time</strong>. My participation will only be confirmed once my application has been approved and payment has been verified.</span></label>
+              <label class="term"><input type="checkbox" name="terms" value="Communication & Conduct" /><span><strong>Communication &amp; Conduct:</strong> I agree to communicate respectfully, respond within reasonable agreed time frames, complete mutually agreed check-ins, and notify Goddess Jade if circumstances affect my ability to participate.</span></label>
+              <label class="term"><input type="checkbox" name="terms" value="Rules & Boundaries" /><span><strong>Rules &amp; Boundaries:</strong> I agree to follow the program rules that have been communicated to me and to respect the boundaries established by all parties. I understand that no rule overrides consent, personal safety, or applicable law.</span></label>
+              <label class="term"><input type="checkbox" name="terms" value="Consent & Safety" /><span><strong>Consent &amp; Safety:</strong> I understand that consent is ongoing and may be withdrawn. I may decline or stop an activity at any time, and any safeword or safety protocol must be respected. I agree to communicate relevant safety concerns honestly.</span></label>
+              <label class="term"><input type="checkbox" name="terms" value="Payment Terms" /><span><strong>Payment Terms:</strong> I understand that the applicable tribute amount, payment schedule, and cancellation or refund terms must be disclosed before I commit to payment. I understand that any payment terms remain subject to applicable law.</span></label>
+              <label class="term"><input type="checkbox" name="terms" value="Privacy & Confidentiality" /><span><strong>Privacy &amp; Confidentiality:</strong> I agree to respect the privacy of Goddess Jade and other participants and not disclose private messages or personal information without permission, except where disclosure is necessary to address a safety concern or required by law.</span></label>
+            </div>
+            <p class="error-msg">Please check every box to continue.</p>
+          </fieldset>
+
+          <div class="field" data-required-signature>
+            <span class="field-label bold" id="sigLabel">Signature of Acknowledgment<span class="req">*</span></span>
+            <div class="signature-wrap">
+              <canvas class="signature-pad" id="signaturePad" role="img" aria-labelledby="sigLabel"></canvas>
+              <button type="button" class="link-btn" id="clearSignature">Clear signature</button>
+            </div>
+            <p class="error-msg">Please add your signature.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="signDate">Date<span class="req">*</span></label>
+            <div class="control"><input type="date" id="signDate" name="signDate" required /></div>
+            <p class="error-msg">Please choose a date.</p>
+          </div>
+        </section>
+
+        <section class="page thanks" data-page="7" data-stage="2" hidden>
+          <h2>Application received</h2>
+          <p>Thank you for applying to No Nut November 2026. Your application will be reviewed and you&rsquo;ll be contacted through the method you provided.</p>
+        </section>
+
+        <div id="navArea">
+          <button type="submit" class="next-btn" id="nextBtn">Next <span aria-hidden="true">&rarr;</span></button>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </div>
+      </form>
+    </main>
 
-        <iframe src="https://form.fillout.com/t/vQYGmm4XNrus" title="Forum form"></iframe>
-      </main>
-    </div>
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js');
-      }
-
-      let deferredPrompt;
-      const installBtn = document.getElementById('installBtn');
-
-      window.addEventListener('beforeinstallprompt', (event) => {
-        event.preventDefault();
-        deferredPrompt = event;
-        installBtn.hidden = false;
-      });
-
-      installBtn.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        installBtn.hidden = true;
-      });
-    </script>
+    <script src="/app.js" defer></script>
   </body>
 </html>
