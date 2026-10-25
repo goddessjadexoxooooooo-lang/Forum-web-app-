@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { sendApplicationSubmittedEmail, sendStatusEmail } from './email.js';
+import { sendStatusEmail } from './email.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -67,16 +67,16 @@ async function updateStatus(id, updates) {
 }
 
 async function notifyStatusChange(app, action) {
-  if (!app?.email) return;
+  if (!app || !app.email) return;
 
-  const statusMessages = {
+  const messages = {
     approve: {
       status: 'approved',
       message: 'Your application has been approved. Payment verification and review are complete.',
     },
     'payment-verified': {
       status: 'payment_verified',
-      message: 'Your payment has been verified. We are finalizing your application review.',
+      message: 'Your payment has been verified. We are finalizing the review of your application.',
     },
     reject: {
       status: 'rejected',
@@ -84,15 +84,11 @@ async function notifyStatusChange(app, action) {
     },
     authorize: {
       status: 'access_authorized',
-      message: 'Your access has been authorized. Your application is now fully approved and active.',
-    },
-    submitted: {
-      status: 'submitted',
-      message: 'Your application has been received and is now under review.',
+      message: 'Your access has been authorized. Your app link is now available.',
     },
   };
 
-  const config = statusMessages[action];
+  const config = messages[action];
   if (!config) return;
 
   try {
@@ -103,7 +99,7 @@ async function notifyStatusChange(app, action) {
       message: config.message,
     });
   } catch (error) {
-    console.error(`Failed to send ${action} email:`, error);
+    console.error(`Email send failed for ${action}:`, error);
   }
 }
 
@@ -160,9 +156,9 @@ export default async function handler(req, res) {
   if (action === 'approve') {
     updated = await updateStatus(id, {
       approval_status: 'approved',
-      status: 'approved',
       payment_status: current.payment_status || 'pending',
       access_status: 'not_authorized',
+      status: 'approved',
     });
     await notifyStatusChange(updated || current, 'approve');
     return res.json({ ok: true, application: updated });
@@ -171,9 +167,9 @@ export default async function handler(req, res) {
   if (action === 'payment-verified' || action === 'payment_verified') {
     updated = await updateStatus(id, {
       payment_status: 'verified',
-      status: 'payment_verified',
       approval_status: current.approval_status || 'pending',
       access_status: 'not_authorized',
+      status: 'payment_verified',
     });
     await notifyStatusChange(updated || current, 'payment-verified');
     return res.json({ ok: true, application: updated });
@@ -182,9 +178,9 @@ export default async function handler(req, res) {
   if (action === 'reject') {
     updated = await updateStatus(id, {
       approval_status: 'rejected',
-      status: 'rejected',
       payment_status: current.payment_status || 'pending',
       access_status: 'not_authorized',
+      status: 'rejected',
     });
     await notifyStatusChange(updated || current, 'reject');
     return res.json({ ok: true, application: updated });
@@ -199,9 +195,9 @@ export default async function handler(req, res) {
 
     updated = await updateStatus(id, {
       access_status: 'authorized',
-      status: 'access_authorized',
       payment_status: 'verified',
       approval_status: 'approved',
+      status: 'access_authorized',
     });
     await notifyStatusChange(updated || current, 'authorize');
     return res.json({ ok: true, application: updated });
