@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Application Admin</title>
+    <style>
+      :root { color-scheme: light; }
+      body { margin: 0; font-family: Arial, sans-serif; background: #f4f7fb; color: #1f2937; }
+      .wrap { max-width: 1200px; margin: 32px auto; padding: 0 16px; }
+      h1 { margin-bottom: 18px; }
+      .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+      #adminSecret { padding: 10px 12px; min-width: 220px; }
+      button { padding: 10px 14px; border: none; cursor: pointer; background: #1d4ed8; color: white; border-radius: 8px; }
+      table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+      th, td { padding: 12px 14px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: top; }
+      th { background: #eef2ff; }
+      .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      .row-actions button { padding: 8px 10px; font-size: 12px; }
+      .muted { color: #4b5563; }
+      .status { display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+      .status.pending { background: #fef3c7; color: #92400e; }
+      .status.verified, .status.approved, .status.authorized { background: #dcfce7; color: #166534; }
+      .status.rejected { background: #fee2e2; color: #991b1b; }
+      .error { color: #b91c1c; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Application Admin</h1>
+      <div class="controls">
+        <input id="adminSecret" type="password" placeholder="Admin secret" />
+        <button id="loadBtn" type="button">Load applications</button>
+      </div>
+      <div id="errorBox" class="error"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Approval</th>
+            <th>Access</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <script>
+      const rowsEl = document.getElementById('rows');
+      const errorBox = document.getElementById('errorBox');
+      const secretEl = document.getElementById('adminSecret');
+
+      function statusPill(value) {
+        const safe = (value || 'pending').toLowerCase();
+        return `<span class="status ${safe}">${safe.replace(/_/g, ' ')}</span>`;
+      }
+
+      async function loadApplications() {
+        errorBox.textContent = '';
+        const secret = secretEl.value.trim();
+        const headers = secret ? { 'x-admin-secret': secret } : {};
+
+        try {
+          const res = await fetch('/api/admin', { headers });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Unable to load applications');
+          }
+
+          const apps = await res.json();
+          rowsEl.innerHTML = apps.map((app) => `
+            <tr>
+              <td>${(app.name || 'Unknown').replace(/</g, '&lt;')}</td>
+              <td>${(app.email || '').replace(/</g, '&lt;')}</td>
+              <td>${statusPill(app.status)}</td>
+              <td>${statusPill(app.payment_status)}</td>
+              <td>${statusPill(app.approval_status)}</td>
+              <td>${statusPill(app.access_status)}</td>
+              <td>${new Date(app.created_at).toLocaleString()}</td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" data-action="approve" data-id="${app.id}">Approve</button>
+                  <button type="button" data-action="payment-verified" data-id="${app.id}">Payment ok</button>
+                  <button type="button" data-action="authorize" data-id="${app.id}">Authorize</button>
+                  <button type="button" data-action="reject" data-id="${app.id}">Reject</button>
+                </div>
+              </td>
+            </tr>
+          `).join('');
+        } catch (error) {
+          errorBox.textContent = error.message;
+          rowsEl.innerHTML = '';
+        }
+      }
+
+      async function runAction(action, id) {
+        const secret = secretEl.value.trim();
+        const headers = { 'Content-Type': 'application/json' };
+        if (secret) headers['x-admin-secret'] = secret;
+
+        const res = await fetch(`/api/admin/${id}/${action}`, {
+          method: 'POST',
+          headers,
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || 'Action failed');
+        }
+
+        await loadApplications();
+      }
+
+      document.getElementById('loadBtn').addEventListener('click', loadApplications);
+      rowsEl.addEventListener('click', async (event) => {
+        const btn = event.target.closest('button[data-action]');
+        if (!btn) return;
+        try {
+          await runAction(btn.dataset.action, btn.dataset.id);
+        } catch (error) {
+          errorBox.textContent = error.message;
+        }
+      });
+
+      loadApplications();
+    </script>
+  </body>
+</html>

@@ -1,62 +1,103 @@
-import { neon } from '@neondatabase/serverless';
+import http from 'node:http';
+import { readFile, stat } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const sql = neon(process.env.DATABASE_URL);
+const root = path.dirname(fileURLToPath(import.meta.url));
+const port = Number(process.env.PORT) || 3000;
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_FIELD_LENGTH = 5000;
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.webp': 'image/webp',
+  '.ico': 'image/x-icon',
+};
 
-function clean(value) {
-  if (typeof value !== 'string') return '';
-  return value.trim().slice(0, MAX_FIELD_LENGTH);
-}
-
-function normalizeAnswers(value) {
-  if (!value || typeof value !== 'object') return {};
-  return Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [key, clean(String(item || ''))])
-  );
-}
-
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-  if (!body || typeof body !== 'object') {
-    return res.status(400).json({ error: 'Invalid request body' });
-  }
-
-  const name = clean(body.name || body.fullName || '');
-  const email = clean(body.email || '');
-  if (!name) return res.status(400).json({ error: 'Name is required' });
-  if (!EMAIL_PATTERN.test(email)) return res.status(400).json({ error: 'A valid email is required' });
-
-  const signatureValue = typeof body.signature === 'string' && body.signature.startsWith('data:image/png;base64,')
-    ? body.signature
-    : '';
-
-  const answers = normalizeAnswers(body.answers || {});
-  const payload = {
-    source: 'chatbot',
-    agreementStatus: body.agreementStatus || 'submitted',
-    paymentStatus: body.paymentStatus || 'pending',
-    approvalStatus: body.approvalStatus || 'pending',
-    accessStatus: body.accessStatus || 'not_authorized',
-    ...answers,
+function withVercelHelpers(res) {
+  res.status = (code) => {
+    res.statusCode = code;
+    return res;
   };
+  res.json = (payload) => {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.end(JSON.stringify(payload));
+    return res;
+  };
+  return res;
+}
+
+async function readBody(req) {
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  const raw = Buffer.concat(chunks).toString('utf8');
+  return raw ? JSON.parse(raw) : {};
+}
+
+async function serveStatic(urlPath, res) {
+  const pathname = new URL(urlPath, 'http://localhost').pathname;
+  const decoded = decodeURIComponent(pathname);
+  let filePath = path.normalize(path.join(root, decoded));
+  if (!filePath.startsWith(root) || filePath.includes(`${path.sep}node_modules`)) {
+    res.statusCode = 404;
+    return res.end('Not found');
+  }
 
   try {
-    const [row] = await sql`
-      INSERT INTO applications (name, email, data, signature)
-      VALUES (${name}, ${email}, ${JSON.stringify(payload)}::jsonb, ${signatureValue})
-      RETURNING id
-    `;
+    if ((await stat(filePath)).isDirectory()) filePath = path.join(filePath, 'index.html');
+  } catch {
+    if (decoded === '/admin') {
+      filePath = path.join(root, 'admin.html');
+    } else if (decoded === '/chatbot') {
+      filePath = path.join(root, 'chatbot.html');
+    } else {
+      filePath = path.join(root, 'index.html');
+    }
+  }
 
-    return res.status(201).json({ id: row.id, source: 'chatbot' });
-  } catch (error) {
-    console.error('Failed to save chatbot submission:', error);
-    return res.status(500).json({ error: 'Could not save chatbot application' });
+  try {
+    const content = await readFile(filePath);
+    res.setHeader('Content-Type', MIME_TYPES[path.extname(filePath)] || 'application/octet-stream');
+    res.setHeader('Cache-Control', 'no-store');
+    res.end(content);
+  } catch {
+    res.statusCode = 404;
+    res.end('Not found');
   }
 }
+
+http
+  .createServer(async (req, res) => {
+    const pathname = new URL(req.url, 'http://localhost').pathname;
+
+    if (pathname === '/api/admin' || pathname.startsWith('/api/admin/')) {
+      const { default: handler } = await import('./api/admin.js');
+      req.body = await readBody(req).catch(() => ({}));
+      return handler(req, withVercelHelpers(res));
+    }
+
+    if (pathname === '/api/chatbot') {
+      const { default: handler } = await import('./api/chatbot.js');
+      req.body = await readBody(req).catch(() => ({}));
+      return handler(req, withVercelHelpers(res));
+    }
+
+    if (pathname === '/api/submit' || pathname === '/api/captcha') {
+      const route = pathname.replace('/api/', '');
+      const { default: handler } = await import(`./api/${route}.js`);
+      req.body = await readBody(req).catch(() => ({}));
+      return handler(req, withVercelHelpers(res));
+    }
+
+    if (pathname === '/admin' || pathname === '/chatbot') {
+      return serveStatic(pathname, res);
+    }
+
+    return serveStatic(req.url, res);
+  })
+  .listen(port, () => console.log(`Preview running on http://localhost:${port}`));
