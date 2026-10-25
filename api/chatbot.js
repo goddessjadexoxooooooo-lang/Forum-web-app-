@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { verifyCaptcha } from './captcha.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -22,13 +23,24 @@ function safeParse(text) {
 
 function normalizeAnswers(value) {
   if (!value || typeof value !== 'object') return {};
-  const normalized = {};
+  const result = {};
   for (const [key, item] of Object.entries(value)) {
     if (typeof key === 'string' && key.length <= 64) {
-      normalized[key] = clean(String(item));
+      result[key] = clean(String(item));
     }
   }
-  return normalized;
+  return result;
+}
+
+async function findExistingApplicationByEmail(email) {
+  const [row] = await sql`
+    SELECT id
+    FROM applications
+    WHERE lower(email) = lower(${email})
+    ORDER BY created_at DESC
+    LIMIT 1
+  `;
+  return row || null;
 }
 
 export default async function handler(req, res) {
@@ -42,12 +54,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  const { applicationId, source = 'chatbot', name, email, signature, answers, agreementStatus, paymentStatus, approvalStatus, accessStatus } = body;
+  const { applicationId, source = 'direct-form', captchaToken, signature, ...fields } = body;
 
-  const applicantName = clean(name || body.fullName || '');
-  const applicantEmail = clean(email || '');
-  if (!applicantName) return res.status(400).json({ error: 'Name is required' });
-  if (!EMAIL_PATTERN.test(applicantEmail)) return res.status(400).json({ error: 'A valid email is required' });
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const remoteIp = typeof forwardedFor === 'string' ? forwardedFor.split(',')[0].trim() : undefined;
+  if (!(await verifyCaptcha(captchaToken, remoteIp))) {
+    return res.status(400).json({ error: 'Captcha check failed. Please try again.' });
+  }
+
+  const mergedAnswers = { ...normalizeAnswers(fields.answers || {}), ...normalizeAnswers(fields.data || {}), ...normalizeAnswers(fields) };
+  const name = clean(fields.name || fields.fullName || '');
+  const email = clean(fields.email || '');
+
+  if (!name) return res.status(400).json({ error: 'Name is required' });
+  if (!EMAIL_PATTERN.test(email)) return res.status(400).json({ error: 'A valid email is required' });
 
   const signatureValue =
     typeof signature === 'string' &&
@@ -56,47 +76,45 @@ export default async function handler(req, res) {
       ? signature
       : null;
 
-  const normalizedAnswers = normalizeAnswers(answers || body.data || {});
+  if (!signatureValue) return res.status(400).json({ error: 'A signature is required' });
+
   const payload = {
     source: clean(source),
-    agreementStatus: agreementStatus || 'submitted',
-    paymentStatus: paymentStatus || 'pending',
-    approvalStatus: approvalStatus || 'pending',
-    accessStatus: accessStatus || 'not_authorized',
-    ...normalizedAnswers,
+    agreementStatus: clean(fields.agreementStatus || 'submitted'),
+    paymentStatus: clean(fields.paymentStatus || 'pending'),
+    approvalStatus: clean(fields.approvalStatus || 'pending'),
+    accessStatus: clean(fields.accessStatus || 'not_authorized'),
+    ...mergedAnswers,
   };
 
-  if (!signatureValue && !body.signature) {
-    return res.status(400).json({ error: 'A signature is required' });
-  }
-
   try {
-    if (applicationId) {
+    const existing = applicationId ? null : await findExistingApplicationByEmail(email);
+    const targetId = applicationId || existing?.id || null;
+
+    if (targetId) {
       const [row] = await sql`
         UPDATE applications
-        SET name = ${applicantName},
-            email = ${applicantEmail},
+        SET name = ${name},
+            email = ${email},
             data = ${JSON.stringify(payload)}::jsonb,
-            signature = COALESCE(${signatureValue}, signature),
+            signature = ${signatureValue},
             updated_at = NOW()
-        WHERE id = ${applicationId}
+        WHERE id = ${targetId}
         RETURNING id
       `;
 
-      if (row) {
-        return res.status(200).json({ id: row.id, updated: true });
-      }
+      return res.status(200).json({ id: row.id, updated: true, source: clean(source) });
     }
 
     const [row] = await sql`
       INSERT INTO applications (name, email, data, signature)
-      VALUES (${applicantName}, ${applicantEmail}, ${JSON.stringify(payload)}::jsonb, ${signatureValue || ''})
+      VALUES (${name}, ${email}, ${JSON.stringify(payload)}::jsonb, ${signatureValue})
       RETURNING id
     `;
 
-    return res.status(201).json({ id: row.id, created: true });
+    return res.status(201).json({ id: row.id, created: true, source: clean(source) });
   } catch (error) {
-    console.error('Failed to save chatbot application:', error);
+    console.error('Failed to save application:', error);
     return res.status(500).json({ error: 'Could not save application' });
   }
 }
