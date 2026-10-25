@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#7d5f3e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Official No Nut November 2026 Application & Commitment Agreement, hosted by Goddess Jade." />
+    <title>No Nut November 2026 Application | Goddess Jade</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button type="button" class="back-btn" id="backBtn" aria-label="Go back" hidden>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+
+      <ol class="stepper" aria-label="Application progress">
+        <li class="step" data-step="0"><span class="step-dot"></span><span class="step-label">Start</span></li>
+        <li class="step" data-step="1"><span class="step-dot"></span><span class="step-label">Details</span></li>
+        <li class="step" data-step="2"><span class="step-dot"></span><span class="step-label">Last step</span></li>
+      </ol>
+
+      <div class="topbar-actions">
+        <a class="chatbot-link" href="/chatbot.html">Chatbot agreement</a>
+        <img class="brand-logo" src="/assets/goddess-jade-logo.svg" alt="Goddess Jade" />
+      </div>
+    </header>
+
+    <main>
+      <form class="card" id="applicationForm" novalidate>
+        <div class="honeypot" aria-hidden="true">
+          <label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <section class="page" data-page="0" data-stage="0">
+          <h1 class="title-xl">NO NUT NOVEMBER 2026</h1>
+          <p class="title-sub">Official Application &amp; Commitment Agreement</p>
+          <p class="hosted">Hosted by Goddess Jade</p>
+
+          <h2 class="welcome-heading">Welcome</h2>
+          <div class="prose">
+            <p>Welcome to the official No Nut November 2026 application. This challenge is for individuals interested in a structured month of chastity, discipline, accountability, and personal growth.</p>
+            <p>Your November experience will take place through Lockyn, my dedicated app designed to bring challenge participation, check-ins, communication, and accountability together in one place.</p>
+            <p>Before applying, take the time to review the expectations and consider whether this experience is right for you. I expect applicants to be honest about their intentions, understand the commitment, and complete the agreement accurately before proceeding.</p>
+            <p>Please answer all required questions accurately and thoughtfully. Your responses will help me assess your eligibility and determine whether this challenge is a suitable fit for you.</p>
+          </div>
+          <p class="ready">Think you&rsquo;re ready? Let&rsquo;s find out.</p>
+        </section>
+
+        <section class="page" data-page="1" data-stage="0" hidden>
+          <h2 class="section-title">Section 1: Applicant Information</h2>
+          <div class="prose">
+            <p>Please enter your contact details below and make sure everything is accurate. Your preferred contact method should be active so you can be reached if needed.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="name">Name / Nickname:<span class="req">*</span></label>
+            <div class="control"><input type="text" id="name" name="name" required autocomplete="nickname" /></div>
+            <p class="error-msg">Please fill in this field.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="contact">What is your Telegram username? If you do not use Telegram, please provide your Snapchat, Microsoft Teams, or another reliable contact method.<span class="req">*</span></label>
+            <div class="control"><input type="text" id="contact" name="contact" required /></div>
+            <p class="error-msg">Please fill in this field.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="email">What is your email address?</label>
+            <div class="control"><input type="email" id="email" name="email" autocomplete="email" /></div>
+            <p class="error-msg">Please enter a valid email address.</p>
+          </div>
+
+          <fieldset class="field" data-required-group="is18">
+            <legend class="field-label">Are you at least 18 years old?<span class="req">*</span></legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="is18" value="Yes" /> Yes</label>
+              <label class="choice"><input type="radio" name="is18" value="No" /> No</label>
+            </div>
+            <p class="error-msg" data-default="Please select an option.">Please select an option.</p>
+          </fieldset>
+        </section>
+
+        <section class="page" data-page="2" data-stage="0" hidden>
+          <h2 class="section-title">Section 2: Interest &amp; Commitment</h2>
+          <div class="prose">
+            <p>This section is intended to help me understand your reasons for applying, what you hope to gain from No Nut November 2026, and whether you are genuinely prepared for the commitment.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="interested">Are you genuinely interested in participating in No Nut November 2026 under Goddess Jade&apos;s direction?</label>
+            <div class="control">
+              <select id="interested" name="interested">
+                <option value=""></option>
+                <option>Yes</option>
+                <option>No</option>
+                <option>Not sure yet</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="why">Why do you want to participate in No Nut November?</label>
+            <div class="control"><textarea id="why" name="why"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="hoping">What are you hoping to get out of this experience?</label>
+            <div class="control"><textarea id="hoping" name="hoping"></textarea></div>
+          </div>
+        </section>
+
+        <section class="page" data-page="3" data-stage="0" hidden>
+          <h2 class="section-title">Section 3: Tribute &amp; Financial Commitment</h2>
+          <div class="prose">
+            <p>Tribute is a required part of participating in No Nut November 2026 under Goddess Jade&rsquo;s direction. The minimum tribute amount is <strong>$20, with no set maximum</strong>. Your required tribute must be received by <strong>November 1, 2026, at 8:00 AM Pacific Time</strong>. Your application will only be confirmed once it has been approved and your payment is verified.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="budget">What is your realistic budget for this experience?</label>
+            <span class="field-label">Short answer. Enter your amount and currency.<span class="req">*</span></span>
+            <span class="hint">Minimum: $20. No maximum.</span>
+            <div class="control"><input type="text" id="budget" name="budget" required /></div>
+            <p class="error-msg">Please fill in this field.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="arrangement">What tribute arrangement can you consistently maintain?<span class="req">*</span></label>
+            <div class="control">
+              <select id="arrangement" name="arrangement" required>
+                <option value=""></option>
+                <option>One-time payment</option>
+                <option>Weekly</option>
+                <option>Bi-weekly</option>
+                <option>Monthly</option>
+                <option>Other (to be discussed)</option>
+              </select>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="commitAmount">What amount can you comfortably commit to your selected payment arrangement?</label>
+            <span class="hint">Short answer</span>
+            <div class="control"><input type="text" id="commitAmount" name="commitAmount" /></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="paymentMethod">Which payment method would you use?<span class="req">*</span></label>
+            <div class="control">
+              <select id="paymentMethod" name="paymentMethod" required>
+                <option value=""></option>
+                <option>Cash App</option>
+                <option>PayPal</option>
+                <option>Venmo</option>
+                <option>Apple Pay</option>
+                <option>Gift card</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="deadlineReady">Are you financially prepared to meet the required tribute deadline of November 1, 2026 at 8:00 AM Pacific Time?</label>
+            <div class="control">
+              <select id="deadlineReady" name="deadlineReady">
+                <option value=""></option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label bold" for="understandConfirmation">Do you understand that your participation will only be confirmed once your application is approved, your payment is received, and the agreement is complete?</label>
+            <div class="control">
+              <select id="understandConfirmation" name="understandConfirmation" required>
+                <option value=""></option>
+                <option>Yes, I understand</option>
+                <option>No, I need clarification</option>
+              </select>
+            </div>
+            <p class="error-msg">Please select an option.</p>
+          </div>
+        </section>
+
+        <section class="page" data-page="4" data-stage="1" hidden>
+          <h2 class="section-title">Section 4: Limits, Boundaries &amp; Safety</h2>
+          <div class="prose">
+            <p>Before participating in No Nut November 2026, it&rsquo;s important that I understand your limits, boundaries, and any safety considerations relevant to your participation. Please answer honestly and as accurately as possible.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="boundaries">What are your personal boundaries or limits for this experience?</label>
+            <div class="control"><textarea id="boundaries" name="boundaries"></textarea></div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="safety">Is there anything you need me to know about your safety, wellbeing, or support needs?</label>
+            <div class="control"><textarea id="safety" name="safety"></textarea></div>
+          </div>
+        </section>
+
+        <section class="page" data-page="5" data-stage="1" hidden>
+          <h2 class="section-title">Section 5: Agreement &amp; Signature</h2>
+          <div class="prose">
+            <p>By proceeding, you are confirming that you understand the agreement, you are participating voluntarily, and you agree to complete the required steps honestly and on time.</p>
+            <p>Please review the wording below and be certain before signing.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="agreementText">Agreement acknowledgment<span class="req">*</span></label>
+            <div class="control"><textarea id="agreementText" name="agreementText" required placeholder="I acknowledge that I have reviewed the agreement and agree to its terms."></textarea></div>
+            <p class="error-msg">Please fill in this field.</p>
+          </div>
+
+          <div class="field" data-required-signature>
+            <label class="field-label" for="signature">Signature:<span class="req">*</span></label>
+            <div class="control">
+              <canvas id="signaturePad" aria-label="Signature pad"></canvas>
+              <button type="button" id="clearSignature" class="clear-btn">Clear</button>
+            </div>
+            <p class="error-msg">Please sign here.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="signDate">Date</label>
+            <div class="control"><input type="date" id="signDate" name="signDate" /></div>
+          </div>
+        </section>
+
+        <section class="page thanks" data-page="6" data-stage="2" hidden>
+          <h2 class="section-title">Application submitted</h2>
+          <div class="prose">
+            <p>Your application has been submitted successfully.</p>
+            <p>Submission does not automatically mean approval, payment verification, or access authorization. Those are separate steps.</p>
+          </div>
+        </section>
+      </form>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
