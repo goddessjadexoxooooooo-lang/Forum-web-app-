@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { verifyCaptcha } from './captcha.js';
+import { sendApplicationSubmittedEmail } from './email.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -11,6 +12,14 @@ function clean(value) {
   if (Array.isArray(value)) return value.map(clean).filter(Boolean).slice(0, 50);
   if (typeof value !== 'string') return '';
   return value.trim().slice(0, MAX_FIELD_LENGTH);
+}
+
+function safeParse(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 export default async function handler(req, res) {
@@ -37,8 +46,8 @@ export default async function handler(req, res) {
     if (/^[a-zA-Z0-9_]{1,64}$/.test(key)) data[key] = clean(value);
   }
 
-  const name = data.name || '';
-  const email = data.email || '';
+  const name = clean(data.name || '');
+  const email = clean(data.email || '');
   if (!name) return res.status(400).json({ error: 'Name is required' });
   if (!EMAIL_PATTERN.test(email)) return res.status(400).json({ error: 'A valid email is required' });
 
@@ -54,19 +63,18 @@ export default async function handler(req, res) {
     const [row] = await sql`
       INSERT INTO applications (name, email, data, signature)
       VALUES (${name}, ${email}, ${JSON.stringify(data)}::jsonb, ${signatureValue})
-      RETURNING id
+      RETURNING id, name, email
     `;
+
+    try {
+      await sendApplicationSubmittedEmail({ email: row.email, name: row.name });
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+    }
+
     return res.status(201).json({ id: row.id });
   } catch (error) {
     console.error('Failed to save application:', error);
     return res.status(500).json({ error: 'Could not save application' });
-  }
-}
-
-function safeParse(text) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
   }
 }
