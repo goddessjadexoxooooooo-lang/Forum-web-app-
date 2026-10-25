@@ -2,6 +2,9 @@
   "name": "forum-web-app",
   "private": true,
   "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.development.local dev-server.mjs"
+  },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0"
   }
